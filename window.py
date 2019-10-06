@@ -9,7 +9,8 @@ import WordHandler
 import re
 
 
-firstSubList = ['Assessments','Class Roll','Course Outline','Course Result Summary','Lecture Material','Other Documents','SpreadSheet']
+firstSubList = ['Assessments','Class Roll','Course Outline','Course Result Summary',
+                'Lecture Material','Other Documents','SpreadSheet']
 assesmentsSubList = []
 assessmentSecondSubList = ['Drafts', 'Moderation Materials', 'Submissions']
 assessmentThirdSubList = ['Moderation forms', 'Three Samples']
@@ -76,7 +77,6 @@ def createAllFolder():
     createSub(rootFolderName, firstSubList)
 
     #create assesment sub folder
-
     createSub(rootFolderName + "\\" + firstSubList[0], assesmentsSubList)
 
     #create assesment second sub folder
@@ -145,25 +145,30 @@ label.config(justify=CENTER, pady=150)
 label.pack()
 
 LabelsFont = font.Font(family='Time New Roman', size=20, weight='bold')
-lblProgName = tk.Label(window, wraplength = 1000, font=LabelsFont, fg="grey", bg="white", text="Course Kit Generator",borderwidth=0,compound="center",highlightthickness=0)
+lblProgName = tk.Label(window, wraplength = 1000, font=LabelsFont, fg="grey", 
+                bg="white", text="Course Kit Generator",borderwidth=0, 
+                compound="center",highlightthickness=0)
 lblProgName.config(justify=CENTER, pady=20)
 lblProgName.pack()
 
 imgOpenSource = PhotoImage(file = "btn_open_source.png")
-btnOpenSource = tk.Button(None, text = "button", image = imgOpenSource, command = fileOpen, borderwidth=0,highlightthickness=0)
+btnOpenSource = tk.Button(None, text = "button", image = imgOpenSource, 
+                command = fileOpen, borderwidth=0,highlightthickness=0)
 btnOpenSource.config(justify=CENTER, pady=20)
 btnOpenSource.pack()
 
 
 LabelsFont = font.Font(family='Time New Roman', size=12, weight='bold')
-lblFileName = tk.Label(window, wraplength = 1000, font=LabelsFont, fg="grey", bg="white", textvariable=filePath, borderwidth=0,compound="center",highlightthickness=0)
+lblFileName = tk.Label(window, wraplength = 1000, font=LabelsFont, fg="grey",
+                bg="white", textvariable=filePath, borderwidth=0,compound="center",highlightthickness=0)
 lblFileName.config(justify=CENTER, pady=20)
 lblFileName.pack()
 
 createOptions()
 
 imgGenerate = PhotoImage(file = "btn_generate.png")
-btnGenerate = tk.Button(None, text = "button", image = imgGenerate, command = createAllFolder, borderwidth=0,highlightthickness=0)
+btnGenerate = tk.Button(None, text = "button", image = imgGenerate,
+                command = createAllFolder, borderwidth=0,highlightthickness=0)
 btnGenerate.config(justify=CENTER, pady=100)
 btnGenerate.pack()
 
@@ -172,7 +177,9 @@ canv.place(x = 0, y = 550)
 canv.create_rectangle(0, 0, 1001, 50, fill="blue", outline="")
 
 LabelsFont = font.Font(family='Time New Roman', size=12, weight='bold')
-lblDeveloper = tk.Label(window, wraplength = 800, font=LabelsFont, fg="white", bg="blue", text="@Developed by Karin Saleh, WooHyeon Seong, Sangik Lee, Heena Sood",borderwidth=0,compound="center",highlightthickness=0)
+lblDeveloper = tk.Label(window, wraplength = 800, font=LabelsFont, fg="white",
+                bg="blue", text="@Developed by Karim Saleh, WooHyeon Seong, Sangik Lee, Heena Sood",
+                borderwidth=0,compound="center",highlightthickness=0)
 lblDeveloper.place(x=120,y=565)
 
 
