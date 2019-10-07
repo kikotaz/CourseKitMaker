@@ -67,7 +67,7 @@ def createAllFolder():
     purePath = str(PureWindowsPath(filePath.get()))
     word = WordHandler.WordHandler()
     extractList = word.extractData(purePath.replace('\\', '\\\\'))
-    for i in range(2, len(extractList)):
+    for i in range(1, len(extractList)):
         print(extractList[i])
         assesmentsSubList.append(removechars(extractList[i]))
         
@@ -98,9 +98,14 @@ def createAllFolder():
     #create lecturer meterials sub folder
     createWeek1to12(rootFolderName + "\\" + firstSubList[4])
 
-    outlinePath = rootFolderName + '\\Course Outline'
-    word.createOutline(removechars(extractList[0]), removechars(extractList[1]), 
-        RadioVariety_1.get(), comboYear.get(), outlinePath)
+    #get the real save folder
+    saveFolder = os.path.dirname(os.path.realpath(filePath.get()))        
+
+    #create save path
+    fileCourseOutlinePath.set(saveFolder + "\\" + rootFolderName + "\\" + firstSubList[2])
+
+    #create course outline file
+    word.createOutline(removechars(extractList[0]), "", RadioVariety_1.get(), comboYear.get(), fileCourseOutlinePath.get().replace('\\', '\\\\'))
 
 def createOptions():
     frame_0 = tk.Frame(window, background="white")
@@ -147,6 +152,7 @@ window.resizable(FALSE, FALSE)
 RadioVariety_1 = StringVar()
 comboYear = StringVar()
 filePath = StringVar()
+fileCourseOutlinePath = StringVar()
 
 imgLogo=tk.PhotoImage(file="logo.png")
 label=tk.Label(window, image=imgLogo, borderwidth=0, highlightthickness=0)
