@@ -7,6 +7,7 @@ import os
 import tkinter as tk
 import WordHandler
 import re
+import ctypes
 
 
 firstSubList = ['Assessments','Class Roll','Course Outline','Course Result Summary',
@@ -16,20 +17,21 @@ assessmentSecondSubList = ['Drafts', 'Moderation Materials', 'Submissions']
 assessmentThirdSubList = ['Moderation forms', 'Three Samples']
 
 def fileOpen() :
-    openFileName = filedialog.askopenfile(
+    openFileName = filedialog.askopenfilename(
             filetypes=(("Word file", "*.doc"),("All Files","*.*")),
             title = "Choose a file."
             )
-    print(openFileName.name)
-    filePath.set(openFileName.name)
-    window.mainloop()
+    if openFileName:
+        filePath.set(openFileName)
+        window.mainloop()
 
 def folderCreate(directory):
     try:
         if not(os.path.exists(directory)):
             os.makedirs(directory)
     except OSError:
-            print("Failed to create directory!!!!!")
+            errorBox = ctypes.windll.user32.MessageBoxW
+            errorBox(None, 'Failed to create directory!!!!!', 0)
 
 def createSub(rootDirectory, folderList):
     try:
@@ -38,7 +40,8 @@ def createSub(rootDirectory, folderList):
             if not(os.path.exists(folderName)):
                 os.makedirs(folderName)
     except OSError:
-            print("Failed to create sub directory!!!!!")
+            errorBox = ctypes.windll.user32.MessageBoxW
+            errorBox(None, 'Failed to create sub directory!!!!!', 0)
 
 def createWeek1to12(rootDirectory):
     try:
@@ -47,7 +50,8 @@ def createWeek1to12(rootDirectory):
             if not(os.path.exists(folderName)):
                 os.makedirs(folderName)
     except OSError:
-            print("Failed to create week directory!!!!!")
+            errorBox = ctypes.windll.user32.MessageBoxW
+            errorBox(None, 'Failed to create week directory!!!!!', 0)
 
 def createAssementsSecondSub(rootDirectory):
     try:
@@ -56,7 +60,8 @@ def createAssementsSecondSub(rootDirectory):
             if not(os.path.exists(folderName)):
                 os.makedirs(folderName)
     except OSError:
-            print("Failed to create week directory!!!!!")
+            errorBox = ctypes.windll.user32.MessageBoxW
+            errorBox(None, 'Failed to create second sub directory!!!!!', 0)
 
 def createAllFolder():
     purePath = str(PureWindowsPath(filePath.get()))
@@ -103,7 +108,7 @@ def createOptions():
     labelframe = tk.LabelFrame(frame_1, text="Semester")
     labelframe.pack()
 
-    RadioVariety_1.set("미선택")
+    RadioVariety_1.set("none")
 
     radio1 = tk.Radiobutton(labelframe, text="Semester 1", value="S1", variable=RadioVariety_1)
     radio1.pack()
@@ -151,7 +156,7 @@ lblProgName = tk.Label(window, wraplength = 1000, font=LabelsFont, fg="grey",
 lblProgName.config(justify=CENTER, pady=20)
 lblProgName.pack()
 
-imgOpenSource = PhotoImage(file = "btn_open_source.png")
+imgOpenSource = PhotoImage(file = "btn_upload_source.png")
 btnOpenSource = tk.Button(None, text = "button", image = imgOpenSource, 
                 command = fileOpen, borderwidth=0,highlightthickness=0)
 btnOpenSource.config(justify=CENTER, pady=20)
