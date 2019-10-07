@@ -67,7 +67,7 @@ def createAllFolder():
     purePath = str(PureWindowsPath(filePath.get()))
     word = WordHandler.WordHandler()
     extractList = word.extractData(purePath.replace('\\', '\\\\'))
-    for i in range(1, len(extractList)):
+    for i in range(2, len(extractList)):
         print(extractList[i])
         assesmentsSubList.append(removechars(extractList[i]))
         
@@ -97,6 +97,10 @@ def createAllFolder():
 
     #create lecturer meterials sub folder
     createWeek1to12(rootFolderName + "\\" + firstSubList[4])
+
+    outlinePath = rootFolderName + '\\Course Outline'
+    word.createOutline(removechars(extractList[0]), removechars(extractList[1]), 
+        RadioVariety_1.get(), comboYear.get(), outlinePath)
 
 def createOptions():
     frame_0 = tk.Frame(window, background="white")
