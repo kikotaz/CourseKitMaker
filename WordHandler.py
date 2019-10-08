@@ -76,6 +76,7 @@ class WordHandler:
             replaceTextInHeader(wordDoc, '[YEAR]', year)
 
             outputPath = filePath + '\\' + courseCode + '-' + sem + '-' + year + '-' + 'CourseOutline.docx'
+
             print(outputPath)
             wordApp.ActiveDocument.SaveAs(outputPath)
             wordApp.Documents.Close()
@@ -84,4 +85,6 @@ class WordHandler:
             successBox(None, 'Course Outline created successfully', 'Congratulations', 0)
         except Exception as e:
             print(e)
+            wordApp.Documents.Close()
+            wordApp.Quit()
     

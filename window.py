@@ -65,11 +65,9 @@ def createAssementsSecondSub(rootDirectory):
 
 def createAllFolder():
     purePath = str(PureWindowsPath(filePath.get()))
-    targetPath = os.path.abspath(purePath)
-    print(targetPath)
     word = WordHandler.WordHandler()
     extractList = word.extractData(purePath.replace('\\', '\\\\'))
-    for i in range(2, len(extractList)):
+    for i in range(1, len(extractList)):
         print(extractList[i])
         assesmentsSubList.append(removechars(extractList[i]))
         
@@ -98,11 +96,12 @@ def createAllFolder():
                 createSub(subSecondFolderName + "\\", assessmentThirdSubList)
 
     #create lecturer meterials sub folder
-    createWeek1to12(rootFolderName + "\\" + firstSubList[4])
+    createWeek1to12(rootFolderName + "\\" + firstSubList[4])     
 
-    outlinePath = os.path.abspath(rootFolderName) + '\\Course Outline'
-    word.createOutline(removechars(extractList[0]), removechars(extractList[1]), 
-        RadioVariety_1.get(), comboYear.get(), outlinePath)
+    outlineFolder = os.path.abspath(rootFolderName) + '\\Course Outline'
+    #create course outline file
+    word.createOutline(removechars(extractList[0]), removechars(extractList[1]), RadioVariety_1.get(),
+     comboYear.get(), outlineFolder)
 
 def createOptions():
     frame_0 = tk.Frame(window, background="white")
@@ -149,6 +148,7 @@ window.resizable(FALSE, FALSE)
 RadioVariety_1 = StringVar()
 comboYear = StringVar()
 filePath = StringVar()
+fileCourseOutlinePath = StringVar()
 
 imgLogo=tk.PhotoImage(file="logo.png")
 label=tk.Label(window, image=imgLogo, borderwidth=0, highlightthickness=0)
@@ -195,6 +195,3 @@ lblDeveloper.place(x=120,y=565)
 
 
 window.mainloop()
-
-
-
