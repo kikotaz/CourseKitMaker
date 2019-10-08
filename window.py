@@ -67,7 +67,7 @@ def createAllFolder():
     purePath = str(PureWindowsPath(filePath.get()))
     word = WordHandler.WordHandler()
     extractList = word.extractData(purePath.replace('\\', '\\\\'))
-    for i in range(1, len(extractList)):
+    for i in range(2, len(extractList)):
         print(extractList[i])
         assesmentsSubList.append(removechars(extractList[i]))
         
