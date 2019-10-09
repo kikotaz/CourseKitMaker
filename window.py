@@ -162,7 +162,7 @@ lblProgName = tk.Label(window, wraplength = 1000, font=LabelsFont, fg="grey",
 lblProgName.config(justify=CENTER, pady=20)
 lblProgName.pack()
 
-imgOpenSource = PhotoImage(file = "btn_upload_source.png")
+imgOpenSource = PhotoImage(file = "btn_open_file.png")
 btnOpenSource = tk.Button(None, text = "button", image = imgOpenSource, 
                 command = fileOpen, borderwidth=0,highlightthickness=0)
 btnOpenSource.config(justify=CENTER, pady=20)
@@ -177,9 +177,14 @@ lblFileName.pack()
 
 createOptions()
 
+lblEmpty = tk.Label(window, wraplength = 1000, font=LabelsFont, fg="grey",
+                bg="white", borderwidth=0,compound="center",highlightthickness=0)
+lblEmpty.config(justify=CENTER, pady=20)
+lblEmpty.pack()
+
 imgGenerate = PhotoImage(file = "btn_generate.png")
 btnGenerate = tk.Button(None, text = "button", image = imgGenerate,
-                command = createAllFolder, borderwidth=0,highlightthickness=0)
+                command = createAllFolder, borderwidth=0,highlightthickness=0, pady=30)
 btnGenerate.config(justify=CENTER, pady=100)
 btnGenerate.pack()
 
