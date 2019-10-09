@@ -75,7 +75,7 @@ class WordHandler:
             replaceTextInHeader(wordDoc, '[SEM]', sem)
             replaceTextInHeader(wordDoc, '[YEAR]', year)
 
-            outputPath = filePath + '\\' + courseCode + '-' + sem + '-' + year + '-' + 'CourseOutline.docx'
+            outputPath = filePath + '\\' + courseCode + '-' + sem + '-' + year + '-' + 'CourseOutline-draft0.docx'
 
             print(outputPath)
             wordApp.ActiveDocument.SaveAs(outputPath)
