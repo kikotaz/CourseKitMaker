@@ -16,6 +16,11 @@ assesmentsSubList = []
 assessmentSecondSubList = ['Drafts', 'Moderation Materials', 'Submissions']
 assessmentThirdSubList = ['Moderation forms', 'Three Samples']
 
+def resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
+
 def fileOpen() :
     openFileName = filedialog.askopenfilename(
             filetypes=(("Word file", "*.doc"),("All Files","*.*")),
@@ -150,7 +155,7 @@ comboYear = StringVar()
 filePath = StringVar()
 fileCourseOutlinePath = StringVar()
 
-imgLogo=tk.PhotoImage(file="logo.png")
+imgLogo=tk.PhotoImage(file=resource_path("logo.png"))
 label=tk.Label(window, image=imgLogo, borderwidth=0, highlightthickness=0)
 label.config(justify=CENTER, pady=150)
 label.pack()
@@ -162,7 +167,7 @@ lblProgName = tk.Label(window, wraplength = 1000, font=LabelsFont, fg="grey",
 lblProgName.config(justify=CENTER, pady=20)
 lblProgName.pack()
 
-imgOpenSource = PhotoImage(file = "btn_open_file.png")
+imgOpenSource = PhotoImage(file=resource_path("btn_open_file.png"))
 btnOpenSource = tk.Button(None, text = "button", image = imgOpenSource, 
                 command = fileOpen, borderwidth=0,highlightthickness=0)
 btnOpenSource.config(justify=CENTER, pady=20)
@@ -182,7 +187,7 @@ lblEmpty = tk.Label(window, wraplength = 1000, font=LabelsFont, fg="grey",
 lblEmpty.config(justify=CENTER, pady=20)
 lblEmpty.pack()
 
-imgGenerate = PhotoImage(file = "btn_generate.png")
+imgGenerate = PhotoImage(file=resource_path("btn_generate.png"))
 btnGenerate = tk.Button(None, text = "button", image = imgGenerate,
                 command = createAllFolder, borderwidth=0,highlightthickness=0, pady=30)
 btnGenerate.config(justify=CENTER, pady=100)
@@ -194,7 +199,7 @@ canv.create_rectangle(0, 0, 1001, 50, fill="blue", outline="")
 
 LabelsFont = font.Font(family='Time New Roman', size=12, weight='bold')
 lblDeveloper = tk.Label(window, wraplength = 800, font=LabelsFont, fg="white",
-                bg="blue", text="@Developed by Karim Saleh, WooHyeon Seong, Sangik Lee, Heena Sood",
+                bg="blue", text="@Developed by X1",
                 borderwidth=0,compound="center",highlightthickness=0)
 lblDeveloper.place(x=120,y=565)
 
