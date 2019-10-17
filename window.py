@@ -9,7 +9,6 @@ import tkinter as tk
 import WordHandler
 import re
 import ctypes
-import pyglet
 import threading
 
 
@@ -189,7 +188,7 @@ def removechars(cellvalue):
 
 def run_animation():
     maxFrame = 30
-    frames = [PhotoImage(file='loading.gif',format = 'gif -index %i' %(i)) for i in range(maxFrame)]
+    frames = [PhotoImage(file=resource_path("loading.gif"),format = 'gif -index %i' %(i)) for i in range(maxFrame)]
     def update(ind):
         if ind == maxFrame:
             ind = 0
