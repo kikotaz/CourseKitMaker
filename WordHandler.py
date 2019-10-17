@@ -12,12 +12,14 @@ class WordHandler:
     
     # Method to extract all the required data from the word file
     def extractData(self, filePath):
+        global wordDoc
+
         try:
-            # Loading Word Application and opening specified Word file
             wordApp = win32.gencache.EnsureDispatch('Word.Application')
             wordApp.Visible = False
-            wordDoc = wordApp.Documents.Open(filePath)           
-        except Exception:
+            wordDoc = wordApp.Documents.Open(filePath) # open file
+        except Exception as e:
+            print(e)
             errorBox = ctypes.windll.user32.MessageBoxW
             errorBox(None, 'Wrong Course Descriptor file type or no Descriptor loaded. '
             + 'Please load a Course Descriptor in .doc format and try again.',
@@ -37,8 +39,8 @@ class WordHandler:
         def closeWord():
             wordApp.Documents.Close()
             wordApp.Quit()
-            successBox = ctypes.windll.user32.MessageBoxW
-            successBox(None, 'Course Kit created successfully', 'Congratulations', 0)
+            #successBox = ctypes.windll.user32.MessageBoxW
+            #successBox(None, 'Course Kit created successfully', 'Message', 0)
 
         # Retrieving the list of assessments from file
         assessmentIndex = getIndex('Summative Assessment')
@@ -81,10 +83,10 @@ class WordHandler:
             wordApp.ActiveDocument.SaveAs(outputPath)
             wordApp.Documents.Close()
             wordApp.Quit()
-            successBox = ctypes.windll.user32.MessageBoxW
-            successBox(None, 'Course Outline created successfully', 'Congratulations', 0)
+            return "S"
         except Exception as e:
             print(e)
             wordApp.Documents.Close()
             wordApp.Quit()
+            return "F"
     
