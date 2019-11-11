@@ -5,15 +5,59 @@ import re
 import ctypes
 
 # Class which will handle all loading data from the .doc file
-class WordHandler:
+class WordHandler:   
+
     # initializer
     def __init__(self):
         print('call WordHandler initializer')
     
+    def closeWord(self, wordApp):
+            wordApp.Documents.Close()
+            wordApp.Quit()
+
+    # Method to check if the uploaded file is a Course Descriptor
+    def checkCourseDescriptor(self, filePath):      
+
+        try:
+            wordApp = win32.gencache.EnsureDispatch('Word.Application')
+            wordApp.Visible = False
+            wordDoc = wordApp.Documents.Open(filePath) # open file
+        except Exception as e:
+            print(e)
+            errorBox = ctypes.windll.user32.MessageBoxW
+            errorBox(None, 'Wrong Course Descriptor file type or no Descriptor loaded. '
+            + 'Please load a Course Descriptor in .doc format and try again.',
+            'Wrong or missing Descriptor.', 0)
+
+        try:
+            table = wordDoc.Tables(1)
+            courseCodeCell = table.Cell(Row = 2, Column = 1).Range.Text
+            courseCodeContent = table.Cell(Row = 2, Column = 2).Range.Text
+            courseTitleCell = table.Cell(Row = 3, Column = 1).Range.Text
+            courseTitleContent = table.Cell(Row = 3, Column = 2).Range.Text
+            
+            pattern = re.compile('[^a-zA-Z0-9]')
+
+            #If the second field is not Course Code or empty field
+            if not pattern.sub('', courseCodeCell) == 'CourseCode' or \
+                len(pattern.sub('', courseCodeContent)) < 1:
+                raise Exception('Course Code')
+            #If the third field is not Course Title or empty field
+            elif not pattern.sub('', courseTitleCell) == 'CourseTitle' or \
+                len(pattern.sub('', courseTitleContent)) < 1:
+                raise Exception('Course Title')
+            else:
+                print('Correct file format')
+        except Exception as e:
+            errorBox = ctypes.windll.user32.MessageBoxW
+            errorBox(None, 'The file you have chosen is not in proper Course Descriptor format ' 
+                + 'or the ' + str(e) +' field is empty. Please check the file and try again.',
+                str(e) + ' error', 0)
+            self.closeWord(wordApp)
+
     # Method to extract all the required data from the word file
     def extractData(self, filePath):
-        global wordDoc
-
+        
         try:
             wordApp = win32.gencache.EnsureDispatch('Word.Application')
             wordApp.Visible = False
@@ -35,12 +79,6 @@ class WordHandler:
             for cell in table.Range.Cells:
                 if cellConent in cell.Range.Text:
                     return cell.RowIndex
-        
-        def closeWord():
-            wordApp.Documents.Close()
-            wordApp.Quit()
-            #successBox = ctypes.windll.user32.MessageBoxW
-            #successBox(None, 'Course Kit created successfully', 'Message', 0)
 
         # Retrieving the list of assessments from file
         assessmentIndex = getIndex('Summative Assessment')
@@ -52,7 +90,7 @@ class WordHandler:
             cellConent = table.Cell(row, 2).Range.Text
             assessments.append(cellConent)
         print(assessments)
-        closeWord()
+        self.closeWord(wordApp)
         return assessments
 
     def createOutline(self, courseCode, title, sem, year, filePath):

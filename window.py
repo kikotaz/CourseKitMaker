@@ -95,6 +95,7 @@ def createAllFolder():
 def doCreateAllFolder(saveFolderName):
     purePath = str(PureWindowsPath(filePath.get()))
     word = WordHandler.WordHandler()
+    word.checkCourseDescriptor(purePath.replace('\\', '\\\\'))
     extractList = word.extractData(purePath.replace('\\', '\\\\'))
     for i in range(2, len(extractList)):
         print(extractList[i])
