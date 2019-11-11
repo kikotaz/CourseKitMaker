@@ -211,6 +211,21 @@ def run_animation():
 def stop_animation():
     canvLoading.place_forget()
 
+def callback_motion(event):
+    print ("motion at")
+    imgOpenSourceOver = PhotoImage(file=resource_path("btn_open_file_hover.png"))
+    btnOpenSource.config(image=imgOpenSourceOver)
+    btnOpenSource.image = imgOpenSourceOver
+
+def callback_leave(event):
+    print ("leave at")
+    imgOpenSourceOver = PhotoImage(file=resource_path("btn_open_file.png"))
+    btnOpenSource.config(image=imgOpenSourceOver)
+    btnOpenSource.image = imgOpenSourceOver    
+
+def callback_click(event):
+    print ("clicked at")
+
 window = tk.Tk()
 window.title("CourseKitMaker")
 window.geometry("500x500")
@@ -238,6 +253,9 @@ imgOpenSource = PhotoImage(file=resource_path("btn_open_file.png"))
 btnOpenSource = tk.Button(None, text = "button", image = imgOpenSource, 
                 command = fileOpen, borderwidth=0,highlightthickness=0)
 btnOpenSource.config(justify=CENTER, pady=20)
+btnOpenSource.bind("<Motion>", callback_motion)
+btnOpenSource.bind("<Leave>", callback_leave)
+btnOpenSource.bind("<Button-1>", callback_click)
 btnOpenSource.pack()
 
 
