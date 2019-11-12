@@ -10,8 +10,7 @@ import WordHandler
 import re
 import ctypes
 import threading
-
-
+import datetime
 
 firstSubList = ['Assessments','Class Roll','Course Outline','Course Result Summary',
                 'Lecture Material','Other Documents','SpreadSheet']
@@ -233,6 +232,18 @@ def createOptions2():
 
     labelframe2 = tk.LabelFrame(frame_2, text="Year")
     labelframe2.pack(expand=True, fill='both')
+
+    currentDate = datetime.datetime.now()
+    currentMonth = currentDate.month
+
+    if 9 <= currentMonth <= 12:
+        semestercode = "S1"
+    
+    if 1 <= currentMonth <= 4:
+        semestercode = "S2"
+    
+    if 5 <= currentMonth <=8:
+        semestercode = "S3"
 
     combo = ttk.Combobox(labelframe2, width=10, textvariable=comboYear)
     for i in range(2019, 2051):
