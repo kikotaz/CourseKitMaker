@@ -31,6 +31,9 @@ def fileOpen() :
             )
     if openFileName:
         filePath.set(openFileName)
+        purePath = str(PureWindowsPath(filePath.get()))
+        word = WordHandler.WordHandler()
+        word.checkCourseDescriptor(purePath.replace('\\', '\\\\'))
         window.mainloop()
 
 def folderCreate(directory):
@@ -211,23 +214,35 @@ def run_animation():
 def stop_animation():
     canvLoading.place_forget()
 
-def callback_motion(event):
-    print ("motion at")
-    imgOpenSourceOver = PhotoImage(file=resource_path("btn_open_file_hover.png"))
-    btnOpenSource.config(image=imgOpenSourceOver)
-    btnOpenSource.image = imgOpenSourceOver
+def callback_motion(event, imgPath, btn):
+    imgOpenSourceOver = PhotoImage(file=resource_path(imgPath))
+    btn.config(image=imgOpenSourceOver)
+    btn.image = imgOpenSourceOver
 
-def callback_leave(event):
-    print ("leave at")
-    imgOpenSourceOver = PhotoImage(file=resource_path("btn_open_file.png"))
-    btnOpenSource.config(image=imgOpenSourceOver)
-    btnOpenSource.image = imgOpenSourceOver    
+def callback_leave(event, imgPath, btn):
+    imgOpenSourceOver = PhotoImage(file=resource_path(imgPath))
+    btn.config(image=imgOpenSourceOver)
+    btn.image = imgOpenSourceOver    
 
-def callback_click(event):
-    print ("clicked at")
+def createOptions2():
+    frame_0 = tk.Frame(window, background="white")
+    frame_0.pack()
+    
+    frame_2 = tk.Frame(frame_0)
+    frame_2.pack(expand=True, side=LEFT, fill='both', padx=50)
+
+    labelframe2 = tk.LabelFrame(frame_2, text="Year")
+    labelframe2.pack(expand=True, fill='both')
+
+    combo = ttk.Combobox(labelframe2, width=10, textvariable=comboYear)
+    for i in range(2019, 2051):
+        combo['values'] = (*combo['values'], i)
+        combo.current(0)
+    combo.pack()
 
 window = tk.Tk()
-window.title("CourseKitMaker")
+window.iconbitmap(resource_path("favicon.ico"))
+window.title("Course Kit Generator")
 window.geometry("500x500")
 window.configure(bg="white")
 window.resizable(FALSE, FALSE)
@@ -249,13 +264,12 @@ lblProgName = tk.Label(window, wraplength = 1000, font=LabelsFont, fg="grey",
 lblProgName.config(justify=CENTER, pady=20)
 lblProgName.pack()
 
-imgOpenSource = PhotoImage(file=resource_path("btn_open_file.png"))
+imgOpenSource = PhotoImage(file=resource_path("btn_open_file21.png"))
 btnOpenSource = tk.Button(None, text = "button", image = imgOpenSource, 
                 command = fileOpen, borderwidth=0,highlightthickness=0)
 btnOpenSource.config(justify=CENTER, pady=20)
-btnOpenSource.bind("<Motion>", callback_motion)
-btnOpenSource.bind("<Leave>", callback_leave)
-btnOpenSource.bind("<Button-1>", callback_click)
+btnOpenSource.bind("<Motion>", lambda event: callback_motion(event,"btn_open_file21_hover.png",btnOpenSource))
+btnOpenSource.bind("<Leave>", lambda event: callback_leave(event,"btn_open_file21.png",btnOpenSource))
 btnOpenSource.pack()
 
 
@@ -276,7 +290,12 @@ imgGenerate = PhotoImage(file=resource_path("btn_generate.png"))
 btnGenerate = tk.Button(None, text = "button", image = imgGenerate,
                 command = createAllFolder, borderwidth=0,highlightthickness=0, pady=30)
 btnGenerate.config(justify=CENTER, pady=50)
+btnGenerate.bind("<Motion>", lambda event: callback_motion(event,"btn_generate_hover.png", btnGenerate))
+btnGenerate.bind("<Leave>", lambda event: callback_leave(event,"btn_generate.png", btnGenerate))
 btnGenerate.pack()
+
+createOptions2()
+
 
 canv=tk.Canvas(window, width=800,height=50, bg="blue", bd=0, highlightthickness=0)
 canv.place(x = 0, y = 450)
