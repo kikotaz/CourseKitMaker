@@ -17,6 +17,7 @@ firstSubList = ['Assessments','Class Roll','Course Outline','Course Result Summa
 assesmentsSubList = []
 assessmentSecondSubList = ['Drafts', 'Moderation Materials', 'Submissions']
 assessmentThirdSubList = ['Moderation forms', 'Three Samples']
+semesterAndYear = []
 
 def resource_path(relative_path):
     if hasattr(sys, '_MEIPASS'):
@@ -103,10 +104,15 @@ def doCreateAllFolder(saveFolderName):
         print(extractList[i])
         assesmentsSubList.append(removechars(extractList[i]))
         
+    tempData = comboSemesterYear.get()
+    splitData = tempData.split(', ')
+    selSemester = splitData[0].replace('Semester ', 'S')
+    selYear = splitData[1]
+
     rootFolderName = "{code}-{semester}-{year}"
     rootFolderName = rootFolderName.replace('{code}', removechars(extractList[0]))
-    rootFolderName = rootFolderName.replace("{semester}", RadioVariety_1.get())
-    rootFolderName = rootFolderName.replace("{year}", comboYear.get())
+    rootFolderName = rootFolderName.replace("{semester}", selSemester)
+    rootFolderName = rootFolderName.replace("{year}", selYear)
 
     rootFolderName = str(PureWindowsPath(saveFolderName)) + "\\" + rootFolderName
     print(rootFolderName)
@@ -135,8 +141,8 @@ def doCreateAllFolder(saveFolderName):
 
     outlineFolder = os.path.abspath(rootFolderName) + '\\Course Outline'
     #create course outline file
-    retVal = word.createOutline(removechars(extractList[0]), removechars(extractList[1]), RadioVariety_1.get(),
-     comboYear.get(), outlineFolder)
+    retVal = word.createOutline(removechars(extractList[0]), removechars(extractList[1]), selSemester,
+     selYear, outlineFolder)
     
     path,filename=os.path.split(filePath.get())
     print("filename == " + filename)
@@ -207,6 +213,14 @@ def run_animation():
     labelLoading.config(bg='white')
     labelLoading.place(x=65, y=15)
 
+    LabelsFont = font.Font(family='Time New Roman', size=10, weight='bold')
+    lblProgName = tk.Label(window, wraplength = 1000, font=LabelsFont, fg="grey", 
+                bg="white", text="In Progress",borderwidth=0, 
+                compound="center",highlightthickness=0)
+    lblProgName.config(justify=CENTER)
+    lblProgName.place(x=65, y=45)
+    lblProgName.pack()
+
     window.after(0, update, 0)
     window.mainloop()
 
@@ -230,23 +244,34 @@ def createOptions2():
     frame_2 = tk.Frame(frame_0)
     frame_2.pack(expand=True, side=LEFT, fill='both', padx=50)
 
-    labelframe2 = tk.LabelFrame(frame_2, text="Year")
+    labelframe2 = tk.LabelFrame(frame_2, text="Semester and Year")
     labelframe2.pack(expand=True, fill='both')
 
     currentDate = datetime.datetime.now()
     currentMonth = currentDate.month
 
     if 9 <= currentMonth <= 12:
-        semestercode = "S1"
+        semesterYear = currentDate.year + 1
+        semesterAndYear.append("Semester 1, " + str(semesterYear))
+        semesterAndYear.append("Semester 2, " + str(semesterYear))
+        semesterAndYear.append("Semester 3, " + str(semesterYear))
     
     if 1 <= currentMonth <= 4:
         semestercode = "S2"
+        semesterYear = currentDate.year
+        semesterAndYear.append("Semester 2, " + str(semesterYear))
+        semesterAndYear.append("Semester 3, " + str(semesterYear))
+        semesterAndYear.append("Semester 1, " + str(semesterYear+1))
     
     if 5 <= currentMonth <=8:
         semestercode = "S3"
+        semesterYear = currentDate.year
+        semesterAndYear.append("Semester 3, " + str(semesterYear))
+        semesterAndYear.append("Semester 1, " + str(semesterYear+1))
+        semesterAndYear.append("Semester 2, " + str(semesterYear+1))
 
-    combo = ttk.Combobox(labelframe2, width=10, textvariable=comboYear)
-    for i in range(2019, 2051):
+    combo = ttk.Combobox(labelframe2, width=20, textvariable=comboSemesterYear)
+    for i in semesterAndYear:
         combo['values'] = (*combo['values'], i)
         combo.current(0)
     combo.pack()
@@ -260,6 +285,7 @@ window.resizable(FALSE, FALSE)
 
 RadioVariety_1 = StringVar()
 comboYear = StringVar()
+comboSemesterYear = StringVar()
 filePath = StringVar()
 fileCourseOutlinePath = StringVar()
 
@@ -290,7 +316,7 @@ lblFileName = tk.Label(window, wraplength = 1000, font=LabelsFont, fg="grey",
 lblFileName.config(justify=CENTER, pady=10)
 lblFileName.pack()
 
-createOptions()
+createOptions2()
 
 lblEmpty = tk.Label(window, wraplength = 1000, font=LabelsFont, fg="grey",
                 bg="white", borderwidth=0,compound="center",highlightthickness=0)
@@ -304,8 +330,6 @@ btnGenerate.config(justify=CENTER, pady=50)
 btnGenerate.bind("<Motion>", lambda event: callback_motion(event,"btn_generate_hover.png", btnGenerate))
 btnGenerate.bind("<Leave>", lambda event: callback_leave(event,"btn_generate.png", btnGenerate))
 btnGenerate.pack()
-
-createOptions2()
 
 
 canv=tk.Canvas(window, width=800,height=50, bg="blue", bd=0, highlightthickness=0)
