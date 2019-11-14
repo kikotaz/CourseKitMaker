@@ -48,11 +48,12 @@ class WordHandler:
                 raise Exception('Course Title')
             else:
                 print('Correct file format')
+                self.closeWord(wordApp)
         except Exception as e:
             errorBox = ctypes.windll.user32.MessageBoxW
             errorBox(None, 'The file you have chosen is not in proper Course Descriptor format ' 
                 + 'or the ' + str(e) +' field is empty. Please check the file and try again.',
-                str(e) + ' error', 0)
+                'Course Descriptor file error', 0)
             self.closeWord(wordApp)
 
     # Method to extract all the required data from the word file

@@ -32,9 +32,24 @@ def fileOpen() :
     if openFileName:
         filePath.set(openFileName)
         purePath = str(PureWindowsPath(filePath.get()))
-        word = WordHandler.WordHandler()
-        word.checkCourseDescriptor(purePath.replace('\\', '\\\\'))
+
+        x = threading.Thread(target=doCheckFileFormat, args=(purePath,))
+        x.start()
+
+        btnOpenSource.configure(state=tk.DISABLED)
+        btnGenerate.configure(state=tk.DISABLED)
+        removeButtonEvent()
+        run_animation("Checking Format...")
         window.mainloop()
+
+def doCheckFileFormat(purePath):
+    word = WordHandler.WordHandler()
+    word.checkCourseDescriptor(purePath.replace('\\', '\\\\'))
+    stop_animation()
+    btnOpenSource.configure(state=tk.NORMAL)
+    btnGenerate.configure(state=tk.NORMAL)
+
+    createButtonEvent()
 
 def folderCreate(directory):
     try:
@@ -92,10 +107,14 @@ def createAllFolder():
         if not isBlank(saveFolderName):
             x = threading.Thread(target=doCreateAllFolder, args=(saveFolderName,))
             x.start()
+
             btnOpenSource.configure(state=tk.DISABLED)
-            run_animation()
+            btnGenerate.configure(state=tk.DISABLED)
+            removeButtonEvent()
+            run_animation("In Progress...")
 
 def doCreateAllFolder(saveFolderName):
+    assesmentsSubList.clear()
     purePath = str(PureWindowsPath(filePath.get()))
     word = WordHandler.WordHandler()
     word.checkCourseDescriptor(purePath.replace('\\', '\\\\'))
@@ -150,14 +169,18 @@ def doCreateAllFolder(saveFolderName):
 
     if retVal=="S":
         stop_animation()
+        filePath.set("")
         successBox = ctypes.windll.user32.MessageBoxW
-        successBox(None, 'The course has been published', 'Message', 0)
+        successBox(None, 'The Course Kit has been published', 'Message', 0)
     else:
         stop_animation()
         failBox = ctypes.windll.user32.MessageBoxW
-        failBox(None, 'The course has been failed', 'Message', 0)
+        failBox(None, 'The Course Kit has failed to publish', 'Message', 0)
 
     btnOpenSource.configure(state=tk.NORMAL)
+    btnGenerate.configure(state=tk.NORMAL)
+
+    createButtonEvent()
 
 def createOptions():
     frame_0 = tk.Frame(window, background="white")
@@ -195,7 +218,7 @@ def removechars(cellvalue):
     text = re.sub(r"[\r\n\t\x07\x0b]", "", cellvalue)
     return text
 
-def run_animation():
+def run_animation(showingText):
     maxFrame = 30
     frames = [PhotoImage(file=resource_path("loading.gif"),format = 'gif -index %i' %(i)) for i in range(maxFrame)]
     def update(ind):
@@ -206,25 +229,28 @@ def run_animation():
         labelLoading.configure(image=frame)
         window.after(100, update, ind)
     global canvLoading
-    canvLoading=tk.Canvas(window, width=200,height=100, bg="white", bd=0, highlightthickness=0)
-    canvLoading.place(x = 150, y = 350)
+    canvLoading=tk.Canvas(window, width=200,height=110, bg="white", bd=0, highlightthickness=0)
+    canvLoading.place(x = 150, y = 335)
 
     labelLoading = Label(canvLoading)
     labelLoading.config(bg='white')
     labelLoading.place(x=65, y=15)
 
     LabelsFont = font.Font(family='Time New Roman', size=10, weight='bold')
-    lblProgName = tk.Label(window, wraplength = 1000, font=LabelsFont, fg="grey", 
-                bg="white", text="In Progress",borderwidth=0, 
+    lblProgressName = tk.Label(canvLoading, wraplength = 1000, font=LabelsFont, fg="red", 
+                bg="white", text=showingText,borderwidth=0, 
                 compound="center",highlightthickness=0)
-    lblProgName.config(justify=CENTER)
-    lblProgName.place(x=65, y=45)
-    lblProgName.pack()
+    lblProgressName.config(pady=10)
+    if(showingText == "In Progress..."):
+        lblProgressName.place(x=60, y=80)
+    else:
+        lblProgressName.place(x=40, y=80)
 
     window.after(0, update, 0)
     window.mainloop()
 
 def stop_animation():
+    lblProgressName.place_forget()
     canvLoading.place_forget()
 
 def callback_motion(event, imgPath, btn):
@@ -242,7 +268,7 @@ def createOptions2():
     frame_0.pack()
     
     frame_2 = tk.Frame(frame_0)
-    frame_2.pack(expand=True, side=LEFT, fill='both', padx=50)
+    frame_2.pack(expand=True, side=LEFT, fill='both', padx=50, pady=10)
 
     labelframe2 = tk.LabelFrame(frame_2, text="Semester and Year")
     labelframe2.pack(expand=True, fill='both')
@@ -261,20 +287,32 @@ def createOptions2():
         semesterYear = currentDate.year
         semesterAndYear.append("Semester 2, " + str(semesterYear))
         semesterAndYear.append("Semester 3, " + str(semesterYear))
-        semesterAndYear.append("Semester 1, " + str(semesterYear+1))
     
     if 5 <= currentMonth <=8:
         semestercode = "S3"
         semesterYear = currentDate.year
         semesterAndYear.append("Semester 3, " + str(semesterYear))
-        semesterAndYear.append("Semester 1, " + str(semesterYear+1))
-        semesterAndYear.append("Semester 2, " + str(semesterYear+1))
 
-    combo = ttk.Combobox(labelframe2, width=20, textvariable=comboSemesterYear)
+    for i in range(semesterYear+1, 2031):
+        for j in range(1, 4):
+            semesterAndYear.append("Semester " + str(j) + ", " + str(i))
+
+    combo = ttk.Combobox(labelframe2, width=20, textvariable=comboSemesterYear, state="readonly")
     for i in semesterAndYear:
         combo['values'] = (*combo['values'], i)
         combo.current(0)
     combo.pack()
+
+def createButtonEvent():
+    btnOpenSource.bind("<Motion>", lambda event: callback_motion(event,"btn_open_file21_hover.png",btnOpenSource))
+    btnOpenSource.bind("<Leave>", lambda event: callback_leave(event,"btn_open_file21.png",btnOpenSource))
+    btnGenerate.bind("<Motion>", lambda event: callback_motion(event,"btn_generate_hover.png", btnGenerate))
+    btnGenerate.bind("<Leave>", lambda event: callback_leave(event,"btn_generate.png", btnGenerate))
+def removeButtonEvent():
+    btnOpenSource.unbind("<Motion>")
+    btnOpenSource.unbind("<Leave>")
+    btnGenerate.unbind("<Motion>")
+    btnGenerate.unbind("<Leave>")
 
 window = tk.Tk()
 window.iconbitmap(resource_path("favicon.ico"))
@@ -305,10 +343,7 @@ imgOpenSource = PhotoImage(file=resource_path("btn_open_file21.png"))
 btnOpenSource = tk.Button(None, text = "button", image = imgOpenSource, 
                 command = fileOpen, borderwidth=0,highlightthickness=0)
 btnOpenSource.config(justify=CENTER, pady=20)
-btnOpenSource.bind("<Motion>", lambda event: callback_motion(event,"btn_open_file21_hover.png",btnOpenSource))
-btnOpenSource.bind("<Leave>", lambda event: callback_leave(event,"btn_open_file21.png",btnOpenSource))
 btnOpenSource.pack()
-
 
 LabelsFont = font.Font(family='Time New Roman', size=10, weight='bold')
 lblFileName = tk.Label(window, wraplength = 1000, font=LabelsFont, fg="grey",
@@ -318,19 +353,19 @@ lblFileName.pack()
 
 createOptions2()
 
-lblEmpty = tk.Label(window, wraplength = 1000, font=LabelsFont, fg="grey",
-                bg="white", borderwidth=0,compound="center",highlightthickness=0)
-lblEmpty.config(justify=CENTER, pady=10)
-lblEmpty.pack()
-
 imgGenerate = PhotoImage(file=resource_path("btn_generate.png"))
 btnGenerate = tk.Button(None, text = "button", image = imgGenerate,
-                command = createAllFolder, borderwidth=0,highlightthickness=0, pady=30)
+                command = createAllFolder, borderwidth=0,highlightthickness=0, pady=0)
 btnGenerate.config(justify=CENTER, pady=50)
-btnGenerate.bind("<Motion>", lambda event: callback_motion(event,"btn_generate_hover.png", btnGenerate))
-btnGenerate.bind("<Leave>", lambda event: callback_leave(event,"btn_generate.png", btnGenerate))
 btnGenerate.pack()
 
+LabelsFont = font.Font(family='Time New Roman', size=10, weight='bold')
+lblProgressName = tk.Label(window, wraplength = 1000, font=LabelsFont, fg="red", 
+            bg="white", text="In Progress",borderwidth=0, 
+            compound="center",highlightthickness=0)
+lblProgressName.config(justify=CENTER, pady=120)
+
+createButtonEvent()
 
 canv=tk.Canvas(window, width=800,height=50, bg="blue", bd=0, highlightthickness=0)
 canv.place(x = 0, y = 450)
