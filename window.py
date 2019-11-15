@@ -11,6 +11,7 @@ import re
 import ctypes
 import threading
 import datetime
+import shutil
 
 firstSubList = ['Assessments','Class Roll','Course Outline','Course Result Summary',
                 'Lecture Material','Other Documents','SpreadSheet']
@@ -30,6 +31,7 @@ def fileOpen() :
             title = "Choose a file."
             )
     if openFileName:
+        fileStatus.set(False)
         filePath.set(openFileName)
         purePath = str(PureWindowsPath(filePath.get()))
 
@@ -44,7 +46,7 @@ def fileOpen() :
 
 def doCheckFileFormat(purePath):
     word = WordHandler.WordHandler()
-    word.checkCourseDescriptor(purePath.replace('\\', '\\\\'))
+    fileStatus.set(word.checkCourseDescriptor(purePath.replace('\\', '\\\\')))
     stop_animation()
     btnOpenSource.configure(state=tk.NORMAL)
     btnGenerate.configure(state=tk.NORMAL)
@@ -55,9 +57,13 @@ def folderCreate(directory):
     try:
         if not(os.path.exists(directory)):
             os.makedirs(directory)
-    except OSError:
-            errorBox = ctypes.windll.user32.MessageBoxW
-            errorBox(None, 'Failed to create directory!!!!!', 0)
+        else:
+            shutil.rmtree(directory)
+            #os.removedirs(directory)
+    except OSError as e:
+        print("folderCreate Exception == " + e)
+        errorBox = ctypes.windll.user32.MessageBoxW
+        errorBox(None, 'Failed to create directory!!!!!', 'Message', 0)
 
 def createSub(rootDirectory, folderList):
     try:
@@ -65,9 +71,10 @@ def createSub(rootDirectory, folderList):
             folderName = rootDirectory+"\\"+i
             if not(os.path.exists(folderName)):
                 os.makedirs(folderName)
-    except OSError:
-            errorBox = ctypes.windll.user32.MessageBoxW
-            errorBox(None, 'Failed to create sub directory!!!!!', 0)
+    except OSError as e:
+        print("folderCreate Exception == " + e)
+        errorBox = ctypes.windll.user32.MessageBoxW
+        errorBox(None, 'Failed to create sub directory!!!!!', 'Message', 0)
 
 def createWeek1to12(rootDirectory):
     try:
@@ -75,9 +82,10 @@ def createWeek1to12(rootDirectory):
             folderName = rootDirectory+"\\week"+str(i)
             if not(os.path.exists(folderName)):
                 os.makedirs(folderName)
-    except OSError:
-            errorBox = ctypes.windll.user32.MessageBoxW
-            errorBox(None, 'Failed to create week directory!!!!!', 0)
+    except OSError as e:
+        print("folderCreate Exception == " + e)
+        errorBox = ctypes.windll.user32.MessageBoxW
+        errorBox(None, 'Failed to create week directory!!!!!', 'Message', 0)
 
 def createAssementsSecondSub(rootDirectory):
     try:
@@ -87,7 +95,7 @@ def createAssementsSecondSub(rootDirectory):
                 os.makedirs(folderName)
     except OSError:
             errorBox = ctypes.windll.user32.MessageBoxW
-            errorBox(None, 'Failed to create second sub directory!!!!!', 0)
+            errorBox(None, 'Failed to create second sub directory!!!!!', 'Message', 0)
 
 def isBlank(myString):
     if myString and myString.strip():
@@ -100,18 +108,22 @@ def createAllFolder():
     print("filePath == " + str(filePath.get()))
     if isBlank(filePath.get()):
         failBox = ctypes.windll.user32.MessageBoxW
-        failBox(None, 'The course decriptor file does not selected', 'Message', 0)
+        failBox(None, 'The Course Descriptor file is not uploaded', 'Message', 0)
     else:
-        saveFolderName = filedialog.askdirectory()
-        print(saveFolderName)
-        if not isBlank(saveFolderName):
-            x = threading.Thread(target=doCreateAllFolder, args=(saveFolderName,))
-            x.start()
+        if(fileStatus.get() == True):
+            saveFolderName = filedialog.askdirectory()
+            print(saveFolderName)
+            if not isBlank(saveFolderName):
+                x = threading.Thread(target=doCreateAllFolder, args=(saveFolderName,))
+                x.start()
 
-            btnOpenSource.configure(state=tk.DISABLED)
-            btnGenerate.configure(state=tk.DISABLED)
-            removeButtonEvent()
-            run_animation("In Progress...")
+                btnOpenSource.configure(state=tk.DISABLED)
+                btnGenerate.configure(state=tk.DISABLED)
+                removeButtonEvent()
+                run_animation("In Progress...")
+        else:
+            failBox = ctypes.windll.user32.MessageBoxW
+            failBox(None, 'The Course Descriptor file format is not correct', 'Message', 0)
 
 def doCreateAllFolder(saveFolderName):
     assesmentsSubList.clear()
@@ -120,7 +132,7 @@ def doCreateAllFolder(saveFolderName):
     word.checkCourseDescriptor(purePath.replace('\\', '\\\\'))
     extractList = word.extractData(purePath.replace('\\', '\\\\'))
     for i in range(2, len(extractList)):
-        print(extractList[i])
+        print("extractList == " + extractList[i])
         assesmentsSubList.append(removechars(extractList[i]))
         
     tempData = comboSemesterYear.get()
@@ -146,14 +158,17 @@ def doCreateAllFolder(saveFolderName):
 
     #create assesment second sub folder
     for i in assesmentsSubList:
-        subFolderName = rootFolderName + "\\" + firstSubList[0] + "\\" + i
-        createAssementsSecondSub(subFolderName)
+        if(isBlank(i)):
+            print("Assessment Title is empty.")
+        else:
+            subFolderName = rootFolderName + "\\" + firstSubList[0] + "\\" + i
+            createAssementsSecondSub(subFolderName)
 
-        for k in assessmentSecondSubList:
-            subSecondFolderName = subFolderName + "\\" + k
-            if (k==assessmentSecondSubList[1]):
-                #create assesment third sub folder
-                createSub(subSecondFolderName + "\\", assessmentThirdSubList)
+            for k in assessmentSecondSubList:
+                subSecondFolderName = subFolderName + "\\" + k
+                if (k==assessmentSecondSubList[1]):
+                    #create assesment third sub folder
+                    createSub(subSecondFolderName + "\\", assessmentThirdSubList)
 
     #create lecturer meterials sub folder
     createWeek1to12(rootFolderName + "\\" + firstSubList[4])     
@@ -325,6 +340,7 @@ RadioVariety_1 = StringVar()
 comboYear = StringVar()
 comboSemesterYear = StringVar()
 filePath = StringVar()
+fileStatus = BooleanVar()
 fileCourseOutlinePath = StringVar()
 
 imgLogo=tk.PhotoImage(file=resource_path("logo.png"))
@@ -346,7 +362,7 @@ btnOpenSource.config(justify=CENTER, pady=20)
 btnOpenSource.pack()
 
 LabelsFont = font.Font(family='Time New Roman', size=10, weight='bold')
-lblFileName = tk.Label(window, wraplength = 1000, font=LabelsFont, fg="grey",
+lblFileName = tk.Label(window, wraplength = 450, font=LabelsFont, fg="grey",
                 bg="white", textvariable=filePath, borderwidth=0,compound="center",highlightthickness=0)
 lblFileName.config(justify=CENTER, pady=10)
 lblFileName.pack()

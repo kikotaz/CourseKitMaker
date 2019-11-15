@@ -17,7 +17,7 @@ class WordHandler:
 
     # Method to check if the uploaded file is a Course Descriptor
     def checkCourseDescriptor(self, filePath):      
-
+        fileStatus = False
         try:
             wordApp = win32.gencache.EnsureDispatch('Word.Application')
             wordApp.Visible = False
@@ -48,6 +48,7 @@ class WordHandler:
                 raise Exception('Course Title')
             else:
                 print('Correct file format')
+                fileStatus = True
                 self.closeWord(wordApp)
         except Exception as e:
             errorBox = ctypes.windll.user32.MessageBoxW
@@ -55,6 +56,9 @@ class WordHandler:
                 + 'or the ' + str(e) +' field is empty. Please check the file and try again.',
                 'Course Descriptor file error', 0)
             self.closeWord(wordApp)
+        
+        print('File Status == ' + str(fileStatus))
+        return fileStatus
 
     # Method to extract all the required data from the word file
     def extractData(self, filePath):
