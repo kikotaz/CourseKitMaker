@@ -87,14 +87,24 @@ class WordHandler:
 
         # Retrieving the list of assessments from file
         assessmentIndex = getIndex('Summative Assessment')
+        if assessmentIndex:
+            print("assessmentIndexs1 == " + str(assessmentIndex))
+        else:
+            print("assessmentIndexs2 == " + str(assessmentIndex))
+
         contentIndex = getIndex('Content')
         assessments = list()
         assessments.append(courseCode)
         assessments.append(courseTitle)
-        for row in range(assessmentIndex + 1, contentIndex):
-            cellConent = table.Cell(row, 2).Range.Text
-            assessments.append(cellConent)
-        print(assessments)
+
+        if assessmentIndex:
+            for row in range(assessmentIndex + 1, contentIndex):
+                cellConent = table.Cell(row, 2).Range.Text
+                assessments.append(cellConent)
+            print(assessments)
+        else:
+            print("Summative Assessment is none")
+
         self.closeWord(wordApp)
         return assessments
 

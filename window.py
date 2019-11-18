@@ -245,7 +245,7 @@ def run_animation(showingText):
         window.after(100, update, ind)
     global canvLoading
     canvLoading=tk.Canvas(window, width=200,height=110, bg="white", bd=0, highlightthickness=0)
-    canvLoading.place(x = 150, y = 335)
+    canvLoading.place(x = 150, y = 370)
 
     labelLoading = Label(canvLoading)
     labelLoading.config(bg='white')
@@ -332,7 +332,7 @@ def removeButtonEvent():
 window = tk.Tk()
 window.iconbitmap(resource_path("favicon.ico"))
 window.title("Course Kit Generator")
-window.geometry("500x500")
+window.geometry("500x530")
 window.configure(bg="white")
 window.resizable(FALSE, FALSE)
 
@@ -384,13 +384,13 @@ lblProgressName.config(justify=CENTER, pady=120)
 createButtonEvent()
 
 canv=tk.Canvas(window, width=800,height=50, bg="blue", bd=0, highlightthickness=0)
-canv.place(x = 0, y = 450)
+canv.place(x = 0, y = 480)
 canv.create_rectangle(0, 0, 1001, 50, fill="blue", outline="")
 
 LabelsFont = font.Font(family='Time New Roman', size=12, weight='bold')
 lblDeveloper = tk.Label(window, wraplength = 800, font=LabelsFont, fg="white",
                 bg="blue", text="@Developed by X1-S3-2019",
                 borderwidth=0,compound="center",highlightthickness=0)
-lblDeveloper.place(x=120,y=465)
+lblDeveloper.place(x=120,y=495)
 
 window.mainloop()
