@@ -31,9 +31,10 @@ def fileOpen() :
             title = "Choose a file."
             )
     if openFileName:
-        fileStatus.set(False)
+        fileStatus.set(True)
         filePath.set(openFileName)
         purePath = str(PureWindowsPath(filePath.get()))
+
 
         x = threading.Thread(target=doCheckFileFormat, args=(purePath,))
         x.start()
@@ -111,16 +112,21 @@ def createAllFolder():
         failBox(None, 'The Course Descriptor file is not uploaded', 'Message', 0)
     else:
         if(fileStatus.get() == True):
+            global saveFolderName
             saveFolderName = filedialog.askdirectory()
             print(saveFolderName)
             if not isBlank(saveFolderName):
+                finishCreateFolder.set(False)
+
                 x = threading.Thread(target=doCreateAllFolder, args=(saveFolderName,))
+                x.daemon = True
                 x.start()
 
                 btnOpenSource.configure(state=tk.DISABLED)
                 btnGenerate.configure(state=tk.DISABLED)
                 removeButtonEvent()
                 run_animation("In Progress...")
+
         else:
             failBox = ctypes.windll.user32.MessageBoxW
             failBox(None, 'The Course Descriptor file format is not correct', 'Message', 0)
@@ -183,10 +189,10 @@ def doCreateAllFolder(saveFolderName):
     copyfile(purePath, outlineFolder + "\\" + filename)
 
     if retVal=="S":
-        stop_animation()
+        finishCreateFolder.set(True)
         filePath.set("")
-        successBox = ctypes.windll.user32.MessageBoxW
-        successBox(None, 'The Course Kit has been published', 'Message', 0)
+        #successBox = ctypes.windll.user32.MessageBoxW
+        #successBox(None, 'The Course Kit has been published', 'Message', 0)
     else:
         stop_animation()
         failBox = ctypes.windll.user32.MessageBoxW
@@ -233,7 +239,7 @@ def removechars(cellvalue):
     text = re.sub(r"[\r\n\t\x07\x0b]", "", cellvalue)
     return text
 
-def run_animation(showingText):
+def run_animation(showingText = None):
     maxFrame = 30
     frames = [PhotoImage(file=resource_path("loading.gif"),format = 'gif -index %i' %(i)) for i in range(maxFrame)]
     def update(ind):
@@ -242,7 +248,14 @@ def run_animation(showingText):
         frame = frames[ind]
         ind += 1
         labelLoading.configure(image=frame)
-        window.after(100, update, ind)
+        aniId = window.after(100, update, ind)
+        if finishCreateFolder.get():
+            window.after_cancel(aniId)
+            labelLoading.place_forget()
+            stop_animation()
+            if(showingText != "In Progress..."):
+                create_finish()
+
     global canvLoading
     canvLoading=tk.Canvas(window, width=200,height=110, bg="white", bd=0, highlightthickness=0)
     canvLoading.place(x = 150, y = 370)
@@ -329,6 +342,77 @@ def removeButtonEvent():
     btnGenerate.unbind("<Motion>")
     btnGenerate.unbind("<Leave>")
 
+def close_intro():
+    canvIntro.place_forget()
+
+def remove_intro():
+    save_reg()
+    canvIntro.place_forget()
+
+def create_intro(event=None):
+    global canvIntro
+    canvIntro=tk.Canvas(window, width=500,height=530, bg="blue", bd=0, highlightthickness=0)
+    canvIntro.place(x = 0, y = 0)
+
+    #create checkbox
+    CheckVariety_1=tk.IntVar()
+    checkbutton1=tk.Checkbutton(canvIntro, text="Don't want show again?", variable=CheckVariety_1, activebackground="blue", command=remove_intro)
+    checkbutton1.place(x=180, y=470)
+
+    imgBtnClose=tk.PhotoImage(file=resource_path("btn_close.png"))
+    btnClose = tk.Button(canvIntro, text = "button", image = imgBtnClose, 
+              command = close_intro, borderwidth=0, highlightthickness=0, bg="red")
+    btnClose.place(x=220, y=500)
+
+    window.mainloop()
+
+def close_finish():
+    canvFinish.place_forget()
+
+def create_finish(event=None):
+    global canvFinish
+    canvFinish=tk.Canvas(window, width=500,height=530, bg="white", bd=0, highlightthickness=0)
+
+    imgThanks=tk.PhotoImage(file=resource_path("thankyou.png"))
+    labelThanks=tk.Label(canvFinish, image=imgThanks, borderwidth=0, highlightthickness=0)
+    labelThanks.place(x=122, y=50)
+
+    imgTurnOff=tk.PhotoImage(file=resource_path("turnOff2.png"))
+    btnTurnOff = tk.Button(canvFinish, text = "button", image = imgTurnOff, 
+                command = close_app, borderwidth=0, highlightthickness=0, bg="white")
+    btnTurnOff.place(x=160, y=350)
+
+    #btnTurnOff.bind("<Motion>", lambda event: callback_motion(event,"turnOff_hover.png",btnTurnOff))
+    #btnTurnOff.bind("<Leave>", lambda event: callback_leave(event,"turnOff2.png",btnTurnOff))
+
+    imgNext=tk.PhotoImage(file=resource_path("right2.png"))
+    btnNext = tk.Button(canvFinish, text = "button", image = imgNext, 
+        command = close_finish, borderwidth=0, highlightthickness=0, bg="white")
+    btnNext.place(x=280, y=350)
+
+    canvFinish.place(x = 0, y = 0)
+    window.mainloop()
+
+def save_reg():
+    f = open("CourseKitGenerator","w+")
+    f.write("Y")
+    f.close()
+
+def read_reg():
+    try:
+        f = open("CourseKitGenerator")
+        skipEnable = f.read()
+        f.close()
+        
+        print(skipEnable)
+        if isBlank(skipEnable):
+            create_intro()
+    except FileNotFoundError:
+        create_intro()
+
+def close_app():
+    exit()
+
 window = tk.Tk()
 window.iconbitmap(resource_path("favicon.ico"))
 window.title("Course Kit Generator")
@@ -342,11 +426,17 @@ comboSemesterYear = StringVar()
 filePath = StringVar()
 fileStatus = BooleanVar()
 fileCourseOutlinePath = StringVar()
+finishCreateFolder = BooleanVar()
 
 imgLogo=tk.PhotoImage(file=resource_path("logo.png"))
 label=tk.Label(window, image=imgLogo, borderwidth=0, highlightthickness=0)
 label.config(justify=CENTER, pady=150)
 label.pack()
+
+imgInfo=tk.PhotoImage(file=resource_path("info.png"))
+labelInfo=tk.Label(window, image=imgInfo, borderwidth=0, highlightthickness=0)
+labelInfo.place(x=460, y=10)
+labelInfo.bind('<Button-1>', create_intro)
 
 LabelsFont = font.Font(family='Time New Roman', size=20, weight='bold')
 lblProgName = tk.Label(window, wraplength = 1000, font=LabelsFont, fg="grey", 
@@ -392,5 +482,7 @@ lblDeveloper = tk.Label(window, wraplength = 800, font=LabelsFont, fg="white",
                 bg="blue", text="@Developed by X1-S3-2019",
                 borderwidth=0,compound="center",highlightthickness=0)
 lblDeveloper.place(x=120,y=495)
+
+read_reg()
 
 window.mainloop()
