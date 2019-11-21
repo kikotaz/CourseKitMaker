@@ -370,6 +370,8 @@ def close_finish():
     canvFinish.place_forget()
 
 def create_finish(event=None):
+    finishCreateFolder.set(False)
+
     global canvFinish
     canvFinish=tk.Canvas(window, width=500,height=530, bg="white", bd=0, highlightthickness=0)
 
