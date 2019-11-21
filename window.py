@@ -350,22 +350,38 @@ def remove_intro():
     canvIntro.place_forget()
 
 def create_intro(event=None):
+    maxFrame = 6
+    frames = [PhotoImage(file=resource_path("introduction_final.gif"),format = 'gif -index %i' %(i)) for i in range(maxFrame)]
+    def update(ind):
+        if ind == maxFrame:
+            ind = 0
+        frame = frames[ind]
+        ind += 1
+        labelLoading.configure(image=frame)
+        window.after(1500, update, ind)
+
     global canvIntro
-    canvIntro=tk.Canvas(window, width=500,height=530, bg="blue", bd=0, highlightthickness=0)
+    canvIntro=tk.Canvas(window, width=500,height=530, bg="white", bd=0, highlightthickness=0)
     canvIntro.place(x = 0, y = 0)
 
-    #create checkbox
-    CheckVariety_1=tk.IntVar()
-    checkbutton1=tk.Checkbutton(canvIntro, text="Don't want show again?", variable=CheckVariety_1, activebackground="blue", command=remove_intro)
-    checkbutton1.place(x=180, y=470)
+    labelLoading = Label(canvIntro)
+    labelLoading.config(bg='white')
+    labelLoading.place(x=0, y=0)
+
+    skipEnable = get_reg()
+    if isBlank(skipEnable): 
+        #create checkbox
+        CheckVariety_1=tk.IntVar()
+        checkbutton1=tk.Checkbutton(canvIntro, text="Don't want show me again?", variable=CheckVariety_1, activebackground="white", bg="white", command=remove_intro)
+        checkbutton1.place(x=180, y=480)
 
     imgBtnClose=tk.PhotoImage(file=resource_path("btn_close.png"))
     btnClose = tk.Button(canvIntro, text = "button", image = imgBtnClose, 
               command = close_intro, borderwidth=0, highlightthickness=0, bg="red")
     btnClose.place(x=220, y=500)
 
+    window.after(0, update, 0)
     window.mainloop()
-
 def close_finish():
     canvFinish.place_forget()
 
@@ -390,7 +406,18 @@ def create_finish(event=None):
     imgNext=tk.PhotoImage(file=resource_path("right2.png"))
     btnNext = tk.Button(canvFinish, text = "button", image = imgNext, 
         command = close_finish, borderwidth=0, highlightthickness=0, bg="white")
-    btnNext.place(x=280, y=350)
+    btnNext.place(x=280, y=345)
+
+    LabelsFont = font.Font(family='Time New Roman', size=11, weight='bold')
+    lblTurnOff = tk.Label(canvFinish, wraplength = 1000, font=LabelsFont, fg="Red", 
+                    bg="white", text="Exit",borderwidth=0, 
+                    compound="center",highlightthickness=0)
+    lblTurnOff.place(x=170, y=400)
+
+    lblNext = tk.Label(canvFinish, wraplength = 1000, font=LabelsFont, fg="grey", 
+                    bg="white", text="Next",borderwidth=0, 
+                    compound="center",highlightthickness=0)
+    lblNext.place(x=285, y=400)
 
     canvFinish.place(x = 0, y = 0)
     window.mainloop()
@@ -399,6 +426,16 @@ def save_reg():
     f = open("CourseKitGenerator","w+")
     f.write("Y")
     f.close()
+
+def get_reg():
+    try:
+        f = open("CourseKitGenerator")
+        skipEnable = f.read()
+        f.close()
+        
+        return skipEnable
+    except FileNotFoundError:
+        return ""
 
 def read_reg():
     try:
